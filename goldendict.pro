@@ -248,6 +248,7 @@ HEADERS += folding.hh \
     article_netmgr.hh \
     dictzip.h \
     btreeidx.hh \
+    enforms.hh \
     stardict.hh \
     chunkedstorage.hh \
     xdxf2html.hh \
@@ -378,6 +379,7 @@ SOURCES += folding.cc \
     article_netmgr.cc \
     dictzip.c \
     btreeidx.cc \
+    enforms.cc \
     stardict.cc \
     chunkedstorage.cc \
     xdxf2html.cc \
