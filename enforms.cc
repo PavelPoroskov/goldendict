@@ -97,8 +97,6 @@ pair< wstring, vector< WordArticleLink > > getVerbFormOne(wstring const & folded
   } 
   else if ( 2 < lenWord && folded.substr( lenWord - 2, 2 ) == L"ed" )
   {
-    //leveraged --> leverage
-    options.push_back( folded.substr( 0, lenWord - 1 ) );
 
     wstring folded_noED = folded.substr( 0, lenWord - 2 );
     int lenWordNoED = lenWord - 2;
@@ -116,6 +114,10 @@ pair< wstring, vector< WordArticleLink > > getVerbFormOne(wstring const & folded
 
     // worked --> work
     options.push_back( folded_noED );
+
+    //leveraged --> leverage
+    //staged --> stage, -stag
+    options.push_back( folded.substr( 0, lenWord - 1 ) );
   }
   else if ( 3 < lenWord && folded.substr( lenWord - 3, 3 ) == L"ing" )
   {
@@ -512,3 +514,14 @@ vector< WordArticleLink > searchAlternatives( wstring const & inWord96,
 
 
 }
+
+//opt-out --> opt out
+
+// article "payroll":  сущ. ; = pay-roll
+//  :pre.dictionary, where payroll --> at once article for "pay-roll"
+//    generate predictionare: articles, where has "=', and one string
+//    place predictionary before common dictionaries
+//  option 2)
+//    transfer with link in article for "payroll"
+
+// colour <--> color
