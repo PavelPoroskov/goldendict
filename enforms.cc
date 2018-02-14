@@ -3,6 +3,7 @@
 #include "btreeidx.hh"
 #include "folding.hh"
 #include "wstring_qt.hh"
+//for debug
 //#include <iostream>
 
 #include <vector>
@@ -25,6 +26,106 @@ using gd::toWString;
 
 using BtreeIndexing::WordArticleLink;
 using BtreeIndexing::BtreeDictionary;
+
+map<wstring, wstring> getIrregularVerbsMap();
+
+map<wstring, wstring> wordMap = getIrregularVerbsMap();
+
+ 
+map<wstring, wstring> getIrregularVerbsMap()
+{
+  map<wstring, wstring> mapw;
+
+  mapw[ L"am" ] = L"be";
+  mapw[ L"is" ] = L"be";
+  mapw[ L"are" ] = L"be";
+  mapw[ L"was" ] = L"be";
+  mapw[ L"were" ] = L"be";
+  mapw[ L"been" ] = L"be";
+  mapw[ L"began" ] = L"begin";
+  mapw[ L"begun" ] = L"begin";
+  mapw[ L"broke" ] = L"break";
+  mapw[ L"broken" ] = L"break";
+  mapw[ L"brought" ] = L"bring";
+  mapw[ L"built" ] = L"build";
+  mapw[ L"bought" ] = L"buy";
+
+  mapw[ L"chose" ] = L"choose";
+  mapw[ L"chosen" ] = L"choose";
+  mapw[ L"came" ] = L"come";
+
+  mapw[ L"did" ] = L"do";
+  mapw[ L"done" ] = L"do";
+  mapw[ L"drawn" ] = L"draw";
+  mapw[ L"drew" ] = L"draw";
+  mapw[ L"driven" ] = L"drive";
+  mapw[ L"drove" ] = L"drive";
+
+  mapw[ L"ate" ] = L"eat";
+  mapw[ L"eaten" ] = L"eat";
+
+  mapw[ L"felt" ] = L"feel";
+  mapw[ L"found" ] = L"find";
+
+  mapw[ L"got" ] = L"get";
+  mapw[ L"gotten" ] = L"get";
+  mapw[ L"gave" ] = L"give";
+  mapw[ L"given" ] = L"give";
+  mapw[ L"gone" ] = L"go";
+  mapw[ L"went" ] = L"go";
+
+  mapw[ L"had" ] = L"have";
+  mapw[ L"has" ] = L"have";
+  mapw[ L"heard" ] = L"hear";
+  mapw[ L"held" ] = L"hold";
+
+  mapw[ L"kept" ] = L"keep";
+  mapw[ L"knew" ] = L"know";
+  mapw[ L"known" ] = L"know";
+
+  mapw[ L"led" ] = L"lead";
+  mapw[ L"left" ] = L"leave";
+  mapw[ L"lain" ] = L"lie";
+  mapw[ L"lay" ] = L"lie";
+  mapw[ L"lost" ] = L"lose";
+
+  mapw[ L"made" ] = L"make";
+  mapw[ L"meant" ] = L"mean";
+  mapw[ L"met" ] = L"meet";
+
+  mapw[ L"paid" ] = L"pay";
+  mapw[ L"ran" ] = L"run";
+
+  mapw[ L"said" ] = L"say";
+  mapw[ L"saw" ] = L"see";
+  mapw[ L"seen" ] = L"see";
+  mapw[ L"sold" ] = L"sell";
+  mapw[ L"sent" ] = L"send";
+  mapw[ L"sat" ] = L"sit";
+  mapw[ L"spoke" ] = L"speak";
+  mapw[ L"spoken" ] = L"speak";
+  mapw[ L"spent" ] = L"spend";
+  mapw[ L"stood" ] = L"stand";
+
+  mapw[ L"taken" ] = L"take";
+  mapw[ L"took" ] = L"take";
+  mapw[ L"taught" ] = L"teach";
+  mapw[ L"told" ] = L"tell";
+  mapw[ L"thought" ] = L"think";
+  mapw[ L"threw" ] = L"throw";
+  mapw[ L"thrown" ] = L"throw";
+
+  mapw[ L"understood" ] = L"understand";
+
+  mapw[ L"wore" ] = L"wear";
+  mapw[ L"worn" ] = L"wear";
+  mapw[ L"won" ] = L"win";
+  mapw[ L"written" ] = L"write";
+  mapw[ L"wrote" ] = L"write";
+
+  return mapw;
+}
+
 
 //( begin: search alternatives 
 bool isEndWithNN( wstring & wordNN )
@@ -92,8 +193,18 @@ pair< wstring, vector< WordArticleLink > > getVerbFormOne(wstring const & folded
       }
     }
 
+    wstring folded_noS = folded.substr( 0, lenWord - 1 );
+    int lenWordNoS = lenWord - 1;
+
+    if ( (2 < lenWordNoS) && (folded_noS.substr( lenWordNoS - 2, 2 ) == L"er" ) )
+    {
+      options.push_back( folded_noS.substr( 0, lenWordNoS - 2 ) );
+      //infringers --> infringe
+      options.push_back( folded_noS.substr( 0, lenWordNoS - 1 ) );
+    }
+
     // books --> book
-    options.push_back( folded.substr( 0, lenWord - 1 ) );    
+    options.push_back( folded_noS );    
   } 
   else if ( 2 < lenWord && folded.substr( lenWord - 2, 2 ) == L"ed" )
   {
@@ -124,15 +235,26 @@ pair< wstring, vector< WordArticleLink > > getVerbFormOne(wstring const & folded
     wstring folded_noING = folded.substr( 0, lenWord - 3 );
     int lenWordNoING = lenWord - 3;
 
-    //icing --> ice
-    options.push_back( folded_noING + L"e" );
-
     // stunning --> stun
     if ( isEndWithNN( folded_noING ) )
       options.push_back( folded_noING.substr( 0, lenWordNoING - 1 ) );
 
     //clanging --> clang
     options.push_back( folded_noING );
+
+    //inlining --> inline, in second dict, but not found
+    options.push_back( folded_noING + L"e" );
+  }
+  else if ( 2 < lenWord && folded.substr( lenWord - 2, 2 ) == L"al" )
+  {
+    wstring folded_noAL = folded.substr( 0, lenWord - 2 );
+//    int lenWordNoAL = lenWord - 2;
+
+    //
+    options.push_back( folded_noAL );
+
+    //traversal --> traverse
+    options.push_back( folded_noAL + L"e" );
   }
   else if ( 2 < lenWord && folded.substr( lenWord - 2, 2 ) == L"ly" )
   {
@@ -173,94 +295,6 @@ pair< wstring, vector< WordArticleLink > > getVerbFormOne(wstring const & folded
   };
 
 
-  map<wstring, wstring> wordMap;
-
-  wordMap[ L"am" ] = L"be";
-  wordMap[ L"is" ] = L"be";
-  wordMap[ L"are" ] = L"be";
-  wordMap[ L"was" ] = L"be";
-  wordMap[ L"were" ] = L"be";
-  wordMap[ L"been" ] = L"be";
-  wordMap[ L"began" ] = L"begin";
-  wordMap[ L"begun" ] = L"begin";
-  wordMap[ L"broke" ] = L"break";
-  wordMap[ L"broken" ] = L"break";
-  wordMap[ L"brought" ] = L"bring";
-  wordMap[ L"built" ] = L"build";
-  wordMap[ L"bought" ] = L"buy";
-
-  wordMap[ L"chose" ] = L"choose";
-  wordMap[ L"chosen" ] = L"choose";
-  wordMap[ L"came" ] = L"come";
-
-  wordMap[ L"did" ] = L"do";
-  wordMap[ L"done" ] = L"do";
-  wordMap[ L"drawn" ] = L"draw";
-  wordMap[ L"drew" ] = L"draw";
-  wordMap[ L"driven" ] = L"drive";
-  wordMap[ L"drove" ] = L"drive";
-
-  wordMap[ L"ate" ] = L"eat";
-  wordMap[ L"eaten" ] = L"eat";
-
-  wordMap[ L"felt" ] = L"feel";
-  wordMap[ L"found" ] = L"find";
-
-  wordMap[ L"got" ] = L"get";
-  wordMap[ L"gotten" ] = L"get";
-  wordMap[ L"gave" ] = L"give";
-  wordMap[ L"given" ] = L"give";
-  wordMap[ L"gone" ] = L"go";
-  wordMap[ L"went" ] = L"go";
-
-  wordMap[ L"had" ] = L"have";
-  wordMap[ L"has" ] = L"have";
-  wordMap[ L"heard" ] = L"hear";
-  wordMap[ L"held" ] = L"hold";
-
-  wordMap[ L"kept" ] = L"keep";
-  wordMap[ L"knew" ] = L"know";
-  wordMap[ L"known" ] = L"know";
-
-  wordMap[ L"led" ] = L"lead";
-  wordMap[ L"left" ] = L"leave";
-  wordMap[ L"lain" ] = L"lie";
-  wordMap[ L"lay" ] = L"lie";
-  wordMap[ L"lost" ] = L"lose";
-
-  wordMap[ L"made" ] = L"make";
-  wordMap[ L"meant" ] = L"mean";
-  wordMap[ L"met" ] = L"meet";
-
-  wordMap[ L"paid" ] = L"pay";
-  wordMap[ L"ran" ] = L"run";
-
-  wordMap[ L"said" ] = L"say";
-  wordMap[ L"saw" ] = L"see";
-  wordMap[ L"seen" ] = L"see";
-  wordMap[ L"sold" ] = L"sell";
-  wordMap[ L"sent" ] = L"send";
-  wordMap[ L"sat" ] = L"sit";
-  wordMap[ L"spoke" ] = L"speak";
-  wordMap[ L"spoken" ] = L"speak";
-  wordMap[ L"spent" ] = L"spend";
-  wordMap[ L"stood" ] = L"stand";
-
-  wordMap[ L"taken" ] = L"take";
-  wordMap[ L"took" ] = L"take";
-  wordMap[ L"taught" ] = L"teach";
-  wordMap[ L"told" ] = L"tell";
-  wordMap[ L"thought" ] = L"think";
-  wordMap[ L"threw" ] = L"throw";
-  wordMap[ L"thrown" ] = L"throw";
-
-  wordMap[ L"understood" ] = L"understand";
-
-  wordMap[ L"wore" ] = L"wear";
-  wordMap[ L"worn" ] = L"wear";
-  wordMap[ L"won" ] = L"win";
-  wordMap[ L"written" ] = L"write";
-  wordMap[ L"wrote" ] = L"write";
 
 //need <iostream>
 //  std::wcout << "before map find*" << folded << "*\n";
@@ -282,9 +316,11 @@ pair< wstring, vector< WordArticleLink > > getVerbFormOne(wstring const & folded
 //  for (vector<wstring>::iterator rit = options.rbegin(); rit!= options.rend(); ++rit)
   for (int j=options.size()-1; 0 <= j; j--)
   {
+//    std::wcout << "options test1: *" << options[j] << "*\n";
     chainTest = dict.findArticles( options[j] ); 
     if ( chainTest.size() != 0 )
     {
+//      std::wcout << "options test1 found: *" << options[j] << "*\n";
       resultWord77 = options[j];
       break;
     };
@@ -516,6 +552,7 @@ vector< WordArticleLink > searchAlternatives( wstring const & inWord96,
 }
 
 //opt-out --> opt out
+//roundtrips --> round trip (found with stemmed search, one result)
 
 // article "payroll":  сущ. ; = pay-roll
 //  :pre.dictionary, where payroll --> at once article for "pay-roll"
@@ -525,3 +562,17 @@ vector< WordArticleLink > searchAlternatives( wstring const & inWord96,
 //    transfer with link in article for "payroll"
 
 // colour <--> color
+
+//1)stemmed search found options (result)
+//2)show
+//    article for best result from step 1 (main window, up)
+//    show all options from stemmed search to choose (bottum)
+
+//show like words (by letters or by pronouncation)
+
+//search with wildcast: small list for, co[lmnr]*
+//  only one word articles
+
+//statistics fot history: where 2 < query_word_times
+
+//composability --> compose ability
