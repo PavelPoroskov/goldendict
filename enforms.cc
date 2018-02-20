@@ -42,6 +42,8 @@ map<wstring, wstring> getIrregularVerbsMap()
   mapw[ L"was" ] = L"be";
   mapw[ L"were" ] = L"be";
   mapw[ L"been" ] = L"be";
+  mapw[ L"bore" ] = L"bear";
+  mapw[ L"borne" ] = L"bear";
   mapw[ L"began" ] = L"begin";
   mapw[ L"begun" ] = L"begin";
   mapw[ L"broke" ] = L"break";
@@ -110,6 +112,7 @@ map<wstring, wstring> getIrregularVerbsMap()
   mapw[ L"taken" ] = L"take";
   mapw[ L"took" ] = L"take";
   mapw[ L"taught" ] = L"teach";
+  mapw[ L"torn" ] = L"tear";
   mapw[ L"told" ] = L"tell";
   mapw[ L"thought" ] = L"think";
   mapw[ L"threw" ] = L"throw";
@@ -561,7 +564,7 @@ vector< WordArticleLink > searchAlternatives( wstring const & inWord96,
 //  option 2)
 //    transfer with link in article for "payroll"
 
-// colour <--> color
+// colour <--> color, labour(labor)
 
 //1)stemmed search found options (result)
 //2)show
@@ -576,3 +579,10 @@ vector< WordArticleLink > searchAlternatives( wstring const & inWord96,
 //statistics fot history: where 2 < query_word_times
 
 //composability --> compose ability
+
+//regexp
+//+ "* up", "* off"
+//switch off results "Cabinet Office" for request "* off", only whole matches
+//switch off maxresults restriction for wildcards search 
+//? "co[lmnr]*" return less than "con*"
+//? result without spaces(one word only)

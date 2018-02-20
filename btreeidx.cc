@@ -344,10 +344,18 @@ void BtreeWordSearchRequest::findMatches()
             {
               wstring word = Utf8::decode( chain[ x ].prefix + chain[ x ].word );
               wstring result = Folding::applyDiacriticsOnly( word );
+//(begin              
+              // if( result.size() >= (wstring::size_type)minMatchLength
+              //     && regexp.indexIn( gd::toQString( result ) ) == 0
+              //     && regexp.matchedLength() >= minMatchLength )
+              // {
+
+              QString qresult = gd::toQString( result );
               if( result.size() >= (wstring::size_type)minMatchLength
-                  && regexp.indexIn( gd::toQString( result ) ) == 0
-                  && regexp.matchedLength() >= minMatchLength )
+                  && regexp.indexIn( qresult ) == 0
+                  && regexp.matchedLength() == qresult.size() )
               {
+//)end                
                 addMatch( word );
               }
             }
@@ -363,8 +371,10 @@ void BtreeWordSearchRequest::findMatches()
 
           if( Qt4x5::AtomicInt::loadAcquire( isCancelled ) )
             break;
-
-          if ( matches.size() >= maxResults )
+//(begin
+//          if ( matches.size() >= maxResults )
+          if ( !useWildcards && matches.size() >= maxResults )
+//)end            
           {
             // For now we actually allow more than maxResults if the last
             // chain yield more than one result. That's ok and maybe even more
